@@ -1,0 +1,217 @@
+# YOLOTest车牌检测数据集配置文件
+# 用于YOLOv10训练的自定义数据集
+
+# 数据集根路径
+path: datasets/YOLOTest
+
+# 训练、验证、测试集相对路径
+train: train/images
+val: val/images
+test: test/images
+
+# 类别数量
+nc: 1
+
+# 类别名称
+names:
+  0: license_plate
+
+# 数据集信息
+dataset_info:
+  name: "YOLOTest License Plate Detection"
+  description: "Custom license plate detection dataset for YOLO training"
+  version: "1.0"
+  source: "Custom collected data"
+
+# 训练配置建议
+training_config:
+  # 图像尺寸
+  imgsz: 960
+  
+  # 批次大小
+  batch_size: 16
+  
+  # 训练轮数
+  epochs: 200
+  
+  # 学习率
+  lr0: 0.01
+  lrf: 0.01
+  
+  # 优化器
+  optimizer: "SGD"  # SGD, Adam, AdamW
+  
+  # 动量
+  momentum: 0.937
+  
+  # 权重衰减
+  weight_decay: 0.0005
+  
+  # 预热
+  warmup_epochs: 3.0
+  warmup_momentum: 0.8
+  warmup_bias_lr: 0.1
+  
+  # 数据增强
+  hsv_h: 0.015      # 色调增强
+  hsv_s: 0.7        # 饱和度增强
+  hsv_v: 0.4        # 明度增强
+  degrees: 0.0      # 旋转角度
+  translate: 0.1    # 平移
+  scale: 0.5        # 缩放
+  shear: 0.0        # 剪切
+  perspective: 0.0  # 透视变换
+  flipud: 0.0       # 上下翻转
+  fliplr: 0.5       # 左右翻转
+  mosaic: 1.0       # Mosaic增强
+  mixup: 0.0        # MixUp增强
+  copy_paste: 0.0   # 复制粘贴增强
+  
+  # 损失权重
+  box: 7.5          # 边界框损失权重
+  cls: 0.5          # 分类损失权重
+  dfl: 1.5          # DFL损失权重
+  
+  # 其他参数
+  patience: 50      # 早停耐心值
+  close_mosaic: 10  # 最后N个epoch关闭mosaic
+  amp: true         # 自动混合精度
+  fraction: 1.0     # 使用数据的比例
+  profile: false    # 性能分析
+  freeze: null      # 冻结层数
+  
+# 验证配置
+validation_config:
+  # IoU阈值
+  iou_thres: 0.6
+  
+  # 置信度阈值
+  conf_thres: 0.25
+  
+  # 最大检测数
+  max_det: 300
+  
+  # 验证频率
+  val_freq: 1
+  
+  # 保存验证图像
+  save_val_imgs: true
+
+# 数据预处理
+preprocessing:
+  # 是否启用自动锚点
+  auto_anchor: true
+  
+  # 是否启用矩形训练
+  rect: false
+  
+  # 缓存图像
+  cache: false
+  
+  # 单类训练
+  single_cls: true
+  
+  # 图像格式
+  image_format: "jpg"
+  
+  # 标注格式
+  label_format: "yolo"
+
+# 后处理
+postprocessing:
+  # NMS IoU阈值
+  nms_iou: 0.45
+  
+  # 置信度阈值
+  conf_threshold: 0.35
+  
+  # 最大检测数
+  max_detections: 100
+  
+  # 多标签NMS
+  multi_label: false
+  
+  # 类别无关NMS
+  agnostic: false
+
+# 评估指标
+metrics:
+  # mAP IoU阈值范围
+  iou_thresholds: [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+  
+  # 主要评估指标
+  primary_metric: "mAP50"
+  
+  # 保存最佳模型的指标
+  save_best_metric: "mAP50-95"
+  
+  # 计算每类AP
+  per_class_ap: true
+
+# 模型配置
+model_config:
+  # 模型架构
+  architecture: "yolov10s"
+  
+  # 预训练权重
+  pretrained: "yolov10s.pt"
+  
+  # 输入通道数
+  ch: 3
+  
+  # 类别数
+  nc: 1
+
+# 硬件配置
+hardware:
+  # 设备
+  device: "auto"  # auto, cpu, 0, 1, 2, 3...
+  
+  # 工作进程数
+  workers: 8
+  
+  # 批次大小
+  batch_size: 16
+
+# 日志和保存
+logging:
+  # 项目名称
+  project: "runs/detect"
+  
+  # 实验名称
+  name: "yolotest_plate"
+  
+  # 是否保存
+  save: true
+  
+  # 保存周期
+  save_period: 10
+  
+  # 详细输出
+  verbose: true
+  
+  # 绘制图表
+  plots: true
+  
+  # 保存最后一个模型
+  save_last: true
+  
+  # 保存最佳模型
+  save_best: true
+
+# 推理配置
+inference:
+  # 默认置信度阈值
+  conf: 0.35
+  
+  # 默认IoU阈值
+  iou: 0.45
+  
+  # 默认图像尺寸
+  imgsz: 960
+  
+  # 半精度推理
+  half: false
+  
+  # TensorRT优化
+  tensorrt: false

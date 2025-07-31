@@ -1,0 +1,278 @@
+# PaddleOCR车牌识别模型微调配置文件
+
+Global:
+  debug: false
+  use_gpu: true
+  epoch_num: 100
+  log_smooth_window: 20
+  print_batch_step: 10
+  save_model_dir: ./output/paddle_plate_rec
+  save_epoch_step: 10
+  eval_batch_step: 500
+  cal_metric_during_train: true
+  pretrained_model: ch_PP-OCRv4_rec_train
+  checkpoints: null
+  save_inference_dir: ./output/paddle_plate_rec/inference
+  use_visualdl: false
+  infer_img: null
+  character_dict_path: ocr/paddle/license_plate_dict.txt
+  character_type: ch
+  max_text_length: 8
+  infer_mode: false
+  use_space_char: false
+  distributed: false
+  save_res_path: ./output/paddle_plate_rec/predicts.txt
+
+Optimizer:
+  name: Adam
+  beta1: 0.9
+  beta2: 0.999
+  lr:
+    name: Cosine
+    learning_rate: 0.001
+    warmup_epoch: 5
+  regularizer:
+    name: L2
+    factor: 1.0e-05
+
+Architecture:
+  model_type: rec
+  algorithm: SVTR_LCNet
+  Transform:
+  Backbone:
+    name: MobileNetV1Enhance
+    scale: 0.5
+    last_conv_stride: [1, 2]
+    last_pool_type: avg
+  Head:
+    name: MultiHead
+    head_list:
+      - CTCHead:
+          Neck:
+            name: svtr
+            dims: 64
+            depth: 2
+            hidden_dims: 120
+            use_guide: True
+          Head:
+            fc_decay: 0.00001
+      - SARHead:
+          enc_dim: 512
+          max_text_length: 8
+
+Loss:
+  name: MultiLoss
+  loss_config_list:
+    - CTCLoss:
+    - SARLoss:
+
+PostProcess:
+  name: CTCLabelDecode
+
+Metric:
+  name: RecMetric
+  main_indicator: acc
+  ignore_space: True
+
+Train:
+  dataset:
+    name: SimpleDataSet
+    data_dir: datasets/CCPD/train
+    label_file_list:
+      - datasets/CCPD/train/rec_gt.txt
+    transforms:
+      - DecodeImage:
+          img_mode: BGR
+          channel_first: false
+      - RecConAug:
+          prob: 0.5
+          ext_data_num: 2
+          image_shape: [48, 320, 3]
+          max_text_length: 8
+      - RecAug:
+      - MultiLabelEncode:
+      - RecResizeImg:
+          image_shape: [3, 48, 320]
+      - KeepKeys:
+          keep_keys:
+            - image
+            - label_ctc
+            - label_sar
+            - length
+            - valid_ratio
+  loader:
+    shuffle: true
+    batch_size_per_card: 256
+    drop_last: true
+    num_workers: 8
+
+Eval:
+  dataset:
+    name: SimpleDataSet
+    data_dir: datasets/CCPD/val
+    label_file_list:
+      - datasets/CCPD/val/rec_gt.txt
+    transforms:
+      - DecodeImage:
+          img_mode: BGR
+          channel_first: false
+      - MultiLabelEncode:
+      - RecResizeImg:
+          image_shape: [3, 48, 320]
+      - KeepKeys:
+          keep_keys:
+            - image
+            - label_ctc
+            - label_sar
+            - length
+            - valid_ratio
+  loader:
+    shuffle: false
+    drop_last: false
+    batch_size_per_card: 256
+    num_workers: 4
+
+# 数据增强配置
+DataAugmentation:
+  # 几何变换
+  geometric:
+    # 旋转角度范围
+    rotation_range: [-10, 10]
+    
+    # 透视变换
+    perspective_prob: 0.3
+    perspective_magnitude: 0.1
+    
+    # 仿射变换
+    affine_prob: 0.3
+    affine_degrees: 10
+    affine_translate: 0.1
+    affine_scale: [0.9, 1.1]
+    affine_shear: 5
+    
+  # 颜色变换
+  color:
+    # 亮度调整
+    brightness_prob: 0.5
+    brightness_delta: 0.2
+    
+    # 对比度调整
+    contrast_prob: 0.5
+    contrast_range: [0.8, 1.2]
+    
+    # 饱和度调整
+    saturation_prob: 0.3
+    saturation_range: [0.8, 1.2]
+    
+    # 色调调整
+    hue_prob: 0.3
+    hue_delta: 0.1
+    
+  # 噪声
+  noise:
+    # 高斯噪声
+    gaussian_prob: 0.2
+    gaussian_std: 0.02
+    
+    # 椒盐噪声
+    salt_pepper_prob: 0.1
+    salt_pepper_ratio: 0.05
+    
+  # 模糊
+  blur:
+    # 高斯模糊
+    gaussian_blur_prob: 0.2
+    gaussian_blur_kernel: [3, 5]
+    
+    # 运动模糊
+    motion_blur_prob: 0.1
+    motion_blur_kernel: [3, 7]
+
+# 训练策略
+TrainingStrategy:
+  # 学习率调度
+  lr_scheduler:
+    type: "cosine"
+    warmup_epochs: 5
+    min_lr: 1e-6
+    
+  # 早停
+  early_stopping:
+    patience: 15
+    min_delta: 0.001
+    
+  # 模型保存
+  model_saving:
+    save_best_only: true
+    save_weights_only: false
+    monitor: "acc"
+    mode: "max"
+    
+  # 梯度裁剪
+  gradient_clipping:
+    enabled: true
+    max_norm: 1.0
+    
+  # 混合精度训练
+  mixed_precision:
+    enabled: true
+    loss_scale: "dynamic"
+
+# 验证配置
+Validation:
+  # 验证频率
+  val_frequency: 1
+  
+  # 验证指标
+  metrics:
+    - accuracy
+    - edit_distance
+    - sequence_accuracy
+    
+  # 可视化
+  visualization:
+    enabled: true
+    num_samples: 10
+    save_path: "./output/paddle_plate_rec/vis"
+
+# 推理配置
+Inference:
+  # 输入图像尺寸
+  input_shape: [3, 48, 320]
+  
+  # 批次大小
+  batch_size: 1
+  
+  # 后处理
+  postprocess:
+    # 置信度阈值
+    confidence_threshold: 0.5
+    
+    # 字符过滤
+    character_filter:
+      enabled: true
+      min_length: 7
+      max_length: 8
+      
+    # 格式验证
+    format_validation:
+      enabled: true
+      pattern: "^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领A-Z]{1}[A-Z]{1}[A-Z0-9]{4,5}[A-Z0-9挂学警港澳]{1}$"
+
+# 导出配置
+Export:
+  # 导出格式
+  formats:
+    - paddle
+    - onnx
+    - tflite
+    
+  # ONNX导出配置
+  onnx:
+    opset_version: 11
+    dynamic_axes: true
+    
+  # TFLite导出配置
+  tflite:
+    quantization: false
+    representative_dataset_size: 100

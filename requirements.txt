@@ -1,0 +1,88 @@
+# ALPR车牌识别系统依赖包
+
+# 深度学习框架
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# 计算机视觉
+opencv-python>=4.8.0
+Pillow>=9.0.0
+scikit-image>=0.20.0
+
+# YOLO检测
+ultralytics>=8.0.0
+
+# OCR识别
+paddlepaddle-gpu>=2.5.0  # GPU版本，CPU版本使用paddlepaddle
+paddleocr>=2.7.0
+fast-plate-ocr>=0.1.0
+
+# 数据处理
+numpy>=1.21.0
+pandas>=1.5.0
+scipy>=1.9.0
+
+# GUI框架
+PyQt5>=5.15.0
+
+# 可视化
+matplotlib>=3.6.0
+seaborn>=0.12.0
+plotly>=5.0.0
+
+# 工具库
+tqdm>=4.64.0
+PyYAML>=6.0
+requests>=2.28.0
+pathlib2
+
+# 图像处理增强
+albumentations>=1.3.0
+imgaug>=0.4.0
+
+# 评估指标
+scikit-learn>=1.3.0
+torchmetrics>=0.11.0
+
+# 模型推理优化
+onnx>=1.14.0
+onnxruntime-gpu>=1.15.0  # GPU版本，CPU版本使用onnxruntime
+
+# 配置管理
+hydra-core>=1.3.0
+omegaconf>=2.3.0
+
+# 实验跟踪
+wandb>=0.15.0
+tensorboard>=2.13.0
+
+# 开发工具
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
+
+# 日志和CLI工具
+rich>=13.0.0
+typer>=0.9.0
+loguru>=0.7.0
+
+# Web服务（可选）
+fastapi>=0.100.0
+uvicorn>=0.23.0
+
+# Jupyter支持（可选）
+jupyter>=1.0.0
+ipykernel>=6.0.0
+ipywidgets>=8.0.0
+
+# 数据版本控制（可选）
+dvc>=3.0.0
+
+# TensorRT支持（可选，需要NVIDIA GPU）
+# tensorrt>=8.6.0
+
+# 其他可选依赖
+# gradio>=3.40.0  # 用于快速构建Web演示界面
+# streamlit>=1.25.0  # 另一个Web界面选择

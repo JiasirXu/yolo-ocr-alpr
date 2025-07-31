@@ -1,0 +1,110 @@
+# CCPD车牌检测数据集配置文件
+# 用于YOLOv10训练
+
+# 数据集根路径
+path: datasets/CCPD_YOLO
+
+# 训练、验证、测试集相对路径
+train: train/images
+val: val/images
+test: test/images
+
+# 类别数量
+nc: 1
+
+# 类别名称
+names:
+  0: license_plate
+
+# 数据集信息
+dataset_info:
+  name: "CCPD License Plate Detection"
+  description: "Chinese City Parking Dataset for license plate detection"
+  version: "2019/2020"
+  source: "https://github.com/detectRecog/CCPD"
+
+# 训练配置建议
+training_config:
+  # 图像尺寸
+  imgsz: 960
+  
+  # 批次大小
+  batch_size: 32
+  
+  # 训练轮数
+  epochs: 150
+  
+  # 学习率
+  lr0: 0.01
+  lrf: 0.01
+  
+  # 数据增强
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  degrees: 0.0
+  translate: 0.1
+  scale: 0.5
+  shear: 0.0
+  perspective: 0.0
+  flipud: 0.0
+  fliplr: 0.5
+  mosaic: 1.0
+  mixup: 0.0
+  
+  # 损失权重
+  box: 7.5
+  cls: 0.5
+  dfl: 1.5
+  
+  # 其他参数
+  patience: 50
+  close_mosaic: 10
+  amp: true
+  
+# 验证配置
+validation_config:
+  # IoU阈值
+  iou_thres: 0.6
+  
+  # 置信度阈值
+  conf_thres: 0.25
+  
+  # 最大检测数
+  max_det: 300
+
+# 数据预处理
+preprocessing:
+  # 是否启用自动锚点
+  auto_anchor: true
+  
+  # 是否启用矩形训练
+  rect: false
+  
+  # 缓存图像
+  cache: false
+  
+  # 单类训练
+  single_cls: true
+
+# 后处理
+postprocessing:
+  # NMS IoU阈值
+  nms_iou: 0.45
+  
+  # 置信度阈值
+  conf_threshold: 0.35
+  
+  # 最大检测数
+  max_detections: 100
+
+# 评估指标
+metrics:
+  # mAP IoU阈值
+  iou_thresholds: [0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
+  
+  # 主要评估指标
+  primary_metric: "mAP50"
+  
+  # 保存最佳模型的指标
+  save_best_metric: "mAP50-95"
