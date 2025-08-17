@@ -4,3 +4,11 @@ dist/
 __pycache__/
 *.pyc
 .env
+# ALPR project additional ignores
+datasets/
+*.onnx
+#*.pt
+*.pth
+*.weights
+runs/
+output/
